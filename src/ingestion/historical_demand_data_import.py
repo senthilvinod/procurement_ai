@@ -4,14 +4,21 @@ from src.database.connection import engine
 
 # Read Excel
 folder_path = os.getenv("EXCEL_FOLDER_PATH")
-file_name = "demand_data.xlsx"
+file_name = "vehicle_demand.csv"
 
 full_path = folder_path+file_name
 print(full_path)
 
+
 # 3. Read the Excel file
-df = pd.read_excel(full_path)
+df = pd.read_csv(full_path)
 print(df.head())
+
+
+df["demand_date"] = pd.to_datetime(df["demand_date"], format="%d-%m-%Y")
+
+
+df["demand_date"] = df["demand_date"].dt.date
 
 table_name = "vehicle_demand_history"  
 
@@ -30,3 +37,4 @@ except Exception as e:
     print(e)
 
 print("\nData import completed")
+
