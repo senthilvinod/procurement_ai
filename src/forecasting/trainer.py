@@ -6,7 +6,7 @@ def train(df):
     train_df = df.rename(
         columns={
             "demand_date":"ds",
-            "shipped_quantity":"y"
+            "quantity":"y"
         }
     )
 

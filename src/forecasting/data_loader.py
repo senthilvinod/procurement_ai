@@ -7,8 +7,8 @@ def load_demand():
     query = """
     SELECT
         demand_date,
-        shipped_quantity
-    FROM demand
+        quantity
+    FROM vehicle_demand_history
     ORDER BY demand_date
     """
 

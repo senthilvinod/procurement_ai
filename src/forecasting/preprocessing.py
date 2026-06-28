@@ -8,7 +8,7 @@ def preprocess(df):
     df = (
         df
         .groupby("demand_date")
-        ["shipped_quantity"]
+        ["quantity"]
         .sum()
         .reset_index()
     )
