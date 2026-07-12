@@ -6,3 +6,5 @@ sqlalchemy
 dotenv
 os
 prophet
+groq
+tavily-python
