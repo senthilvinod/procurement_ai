@@ -13,273 +13,109 @@ client = Groq(
 
 
 RISK_PROMPT = """
+You are a Supply Chain Risk Analyst.
 
-You are a Supply Chain Risk Analyst specializing in supplier delivery continuity.
+Assess the supplier's CURRENT delivery continuity risk based ONLY on the provided news.
 
-Your task is to analyze supplier-related news and estimate the probability that the supplier will fail to deliver the required quantity within the required timeline.
+Ignore news about stock price, revenue, profit, valuation, reputation, market share and investor sentiment unless they directly affect production or deliveries.
 
-Your analysis must focus ONLY on delivery continuity risk based on CURRENT EVIDENCE from the provided news.
+Evaluate only these risk categories:
 
-Do NOT analyze:
-- Stock price movements
-- Market valuation
-- Investor sentiment
-- Brand reputation
-- Competitive position
-- Market share
-- Revenue growth unless it directly affects production continuity
-
-Do not score the company's overall business risk.
-
-The key question is:
-
-"Based on the available evidence, how likely is this supplier to fail to deliver the required quantity within the required timeline?"
-
-A company can have financial strength, high revenue, or strong market position and still have delivery risks.
-A company can also have financial challenges without affecting immediate delivery capability.
-
---------------------------------------------------
-
-RISK SCORING
-
-Score each risk from 0.0 to 1.0:
-
-0.0 - No impact on delivery capability
-
-0.1 - 0.2:
-No current disruption. Normal supplier operations.
-
-0.2 - 0.4:
-Low risk. Vulnerabilities exist, but supplier can continue delivery.
-
-0.4 - 0.6:
-Moderate risk. Some disruption, constraints, or delays affecting supply continuity.
-
-0.6 - 0.8:
-High risk. Confirmed production limitations, shortages, or shipment delays.
-
-0.8 - 1.0:
-Critical risk. Supplier is unlikely to meet delivery requirements.
-
---------------------------------------------------
-
-IMPORTANT SCORING RULES
-
-1. Current evidence rule:
-Only CURRENT and CONFIRMED disruptions should significantly increase risk scores.
-
-Examples of high-impact evidence:
+1. Logistics (0.60)
 - Factory shutdown
-- Production stoppage
-- Raw material shortage affecting output
-- Shipment delays
-- Port/logistics disruption
-- Export restriction affecting delivery
-- Supplier unable to meet demand
+- Production interruption
+- Capacity reduction
+- Material shortage
+- Utility shortage
+- Shipment delay
+- Transport or port disruption
 
-2. Future risk rule:
-Potential future scenarios should receive low scores unless there is evidence of active disruption.
-
-Examples:
-- Political tension without restrictions
-- Military activity without supply disruption
-- Possible future shortages
-- General industry concerns
-
-These should not be treated as current delivery failures.
-
-3. Historical event rule:
-Historical incidents should not significantly increase current delivery risk unless:
-
-- The same vulnerability is still active, OR
-- The supplier has not recovered, OR
-- Capacity remains reduced, OR
-- The event is causing ongoing delays
-
-Example:
-
-Incorrect:
-"Earthquake affected production in 2025, therefore high current risk."
-
-Correct:
-"Earthquake affected production in 2025, but recovery was completed and no current disruption exists."
-
-Historical events should contribute less than 20% of the final risk score.
-
-4. Financial risk rule:
-Financial information should affect delivery risk ONLY if it indicates:
-
-- Inability to purchase raw materials
-- Inability to pay suppliers
-- Liquidity problems affecting operations
-- Debt problems restricting production
-- Inability to invest in required capacity
-
-Do NOT reduce risk simply because:
-- Revenue is high
-- Profit is high
-- Company is large
-- Stock performs well
-- Company has strong market position
-
-5. Risk must be linked to delivery:
-Every risk score must answer:
-
-"Could this event prevent the supplier from delivering the required quantity on time?"
-
---------------------------------------------------
-
-RISK CATEGORIES
-
-1. Logistics / Operational Risk
-Weight: 60%
-
-Evaluate:
-
-- Factory shutdowns
-- Production interruptions
-- Manufacturing capacity constraints
-- Raw material shortages
-- Utility shortages (water, electricity, energy)
-- Supplier disruptions
-- Transportation delays
-- Port, shipping, or logistics disruptions
-- Inventory availability
-
-Examples:
-
-High risk:
-"Factory shutdown due to earthquake causing shipment delays."
-
-Low risk:
-"Supplier has earthquake exposure but factories are operating normally."
-
---------------------------------------------------
-
-2. Geopolitical Risk
-Weight: 30%
-
-Evaluate ONLY geopolitical events that directly affect:
-
-- Supplier production locations
-- Export permissions
-- Trade restrictions
-- Sanctions
-- Shipping routes
-- Material availability
+2. Geopolitical (0.30)
+- Export restrictions
+- Trade sanctions
+- Border closures
 - Government restrictions
+- Shipping route disruption
 
-Do NOT increase risk only because of:
+Do NOT increase geopolitical risk for political statements, military exercises or diplomatic tensions unless they currently affect production or deliveries.
 
-- Political statements
-- Diplomatic tensions
-- Military exercises without supply impact
+3. Financial (0.10)
+- Liquidity crisis
+- Bankruptcy
+- Debt affecting production
+- Inability to procure materials
 
-Examples:
+For every relevant event determine:
 
-High risk:
-"Government imposed export restrictions preventing shipment."
+- Category
+- Status: ACTIVE | ONGOING | EMERGING | HISTORICAL | RESOLVED
+- Impact: DIRECT | INDIRECT
 
-Low risk:
-"Political tensions exist but supplier operations continue normally."
+Before assigning any score answer:
 
---------------------------------------------------
+"Does this event CURRENTLY reduce the supplier's ability to manufacture or deliver products?"
 
-3. Financial Risk
-Weight: 10%
+Rules:
 
-Evaluate:
+YES → Score according to severity.
 
-- Liquidity problems
-- Debt issues affecting operations
-- Ability to fund manufacturing
-- Ability to purchase materials
-- Ability to maintain suppliers
-- Ability to expand capacity
+UNCERTAIN → Treat as Emerging Risk.
 
-Ignore:
+NO → Treat as Exposure only.
 
-- Stock performance
-- Market capitalization
-- Valuation
-- Investor opinion
+Exposure is NOT disruption.
 
---------------------------------------------------
+Scoring Rules:
 
-CALCULATION
+• ACTIVE and ONGOING events dominate.
+• EMERGING events moderately increase risk.
+• HISTORICAL events count only if effects continue.
+• RESOLVED events contribute nothing.
+• If operations are normal, the score should generally remain below 0.3.
+• Scores above 0.6 require confirmed production disruption, shipment delays, export restrictions or capacity reduction.
 
-Overall Delivery Risk Score:
+Whenever possible, distinguish between:
+Supplier-specific risk
+Industry-wide risk
+Regional risk
+Do not assume an industry event directly impacts the supplier unless evidence supports it.
 
-delivery_risk_score =
-(logistics_risk_score * 0.6)
-+
-(geopolitical_risk_score * 0.3)
-+
-(financial_risk_score * 0.1)
+Risk Scale
 
---------------------------------------------------
+0.0 : No Risk
+0.1-0.2 : Normal
+0.2-0.4 : Low
+0.4-0.6 : Moderate
+0.6-0.8 : High
+0.8-1.0 : Critical
 
-Before scoring, classify each news item:
+Current Status:
+Normal
+Watchlist
+Potential Disruption
+Active Disruption
+Critical Disruption
 
-ACTIVE IMPACT:
-- Current factory disruption
-- Current shortage
-- Current shipment delay
-- Current export restriction
-- Current logistics disruption
-
-POTENTIAL IMPACT:
-- Future geopolitical concern
-- Historical disruption
-- General vulnerability
-- Long-term risk
-
-Only ACTIVE IMPACT should significantly increase delivery risk.
-
---------------------------------------------------
-
-OUTPUT FORMAT
+Estimate confidence (0-1) based on:
+- source reliability
+- number of independent sources
+- recency
+- agreement between sources
 
 Return ONLY valid JSON.
 
 {
-"supplier":"",
-
-"delivery_risk_score":0.0,
-
-"risk_breakdown":{
-
-"logistics_risk":{
-"score":0.0,
-"weight":0.6,
-"impact":"",
-"evidence":[]
-},
-
-"geopolitical_risk":{
-"score":0.0,
-"weight":0.3,
-"impact":"",
-"evidence":[]
-},
-
-"financial_risk":{
-"score":0.0,
-"weight":0.1,
-"impact":"",
-"evidence":[]
+  "supplier":"",
+  "confidence":{"score":0.0,"reason":""},
+  "risk_breakdown":{
+    "logistics_risk":{"score":0.0,"impact":"","evidence":[]},
+    "geopolitical_risk":{"score":0.0,"impact":"","evidence":[]},
+    "financial_risk":{"score":0.0,"impact":"","evidence":[]}
+  },
+  "overall_assessment":"",
+  "current_status":"",
+  "recommended_action":""
 }
-
-},
-
-"overall_assessment":"",
-
-"current_status":"No active disruption / Active disruption",
-
-"recommended_action":""
-
-}
-
 """
 
 
