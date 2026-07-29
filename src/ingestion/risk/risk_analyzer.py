@@ -3,7 +3,6 @@ import json
 from groq import Groq
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 
@@ -102,7 +101,19 @@ Estimate confidence (0-1) based on:
 - recency
 - agreement between sources
 
-Return ONLY valid JSON.
+Return ONLY a single valid JSON object.
+
+Do not include:
+- Markdown
+- Triple backticks
+- Explanations
+- Notes
+- Comments
+- Introductory text
+- Trailing text
+
+The first character must be '{'
+The last character must be '}'
 
 {
   "supplier":"",
@@ -146,18 +157,11 @@ Tavily News:
 Analyze the delivery continuity risk.
 
 """
-
-
     response = client.chat.completions.create(
-
-        model="qwen/qwen3-32b",
-
+        model="qwen/qwen3.6-27b",
         temperature=0,
-
-        response_format={
-            "type":"json_object"
-        },
-
+        reasoning_effort="none",
+        response_format={"type":"json_object"},
         messages=[
 
             {
@@ -173,7 +177,8 @@ Analyze the delivery continuity risk.
         ]
     )
 
-
+    #print(response.choices[0].message.content)
     return json.loads(
         response.choices[0].message.content
     )
+
