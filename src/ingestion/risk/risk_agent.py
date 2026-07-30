@@ -7,7 +7,7 @@ client = TavilyRiskClient()
 
 company = "TSMC"
 
-data = client.fetch_all_news(
+data = client.fetch_all_news( 
     company=company,
     location="Taiwan"
 )
