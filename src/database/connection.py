@@ -9,3 +9,6 @@ f"/{DB_NAME}"
 )
 
 engine=create_engine(DATABASE_URL)
+
+def get_engine():
+    return engine

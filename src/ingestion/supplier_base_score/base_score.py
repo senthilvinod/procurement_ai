@@ -53,7 +53,4 @@ def calculate_base_score():
 
     return df
 
-result = calculate_base_score()
 
-print("\n========== FINAL BASE SCORE ==========\n")
-print(result.sort_values("base_score", ascending=False).reset_index(drop=True))

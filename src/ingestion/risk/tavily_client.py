@@ -39,21 +39,21 @@ class TavilyRiskClient:
     # 1. Geopolitical news
     # -----------------------------
     def get_geopolitical_news(self, location: str, company: str):
-        query = f"Find recent geopolitical news affecting {company} in {location}. Focus on political tensions, government policies, trade restrictions, sanctions, diplomatic conflicts, military developments, and regulatory changes that may impact business operations or supply chains. Return only relevant news with title, date, source, and summary"
+        query = f"Find recent geopolitical news affecting {company} in {location}. Focus on political tensions, government policies, trade restrictions and regulatory changes that may impact business operations or supply chains. Return only relevant news with title, date, source, and summary"
         return self.search(query)
 
     # -----------------------------
     # 2. Operational news
     # -----------------------------
     def get_operational_news(self, location: str, company: str):
-        query = f"Find recent logistics disruption events affecting {company} in {location}. Focus only on actual incidents in the last 30 days: factory shutdowns, production delays, shipping disruptions, supplier failures, material shortages, utility outages, and natural disasters. Return title, date, source, and summary only. Exclude reports, studies, historical analysis"
+        query = f"Find logistics disruption affecting {company} in {location}. Focus only on actual incidents in the last 30 days: factory shutdowns, production delays, shipping disruptions, supplier failures, material shortages and natural disasters. Return title, date, source, and summary only. Exclude reports, studies, historical analysis"
         return self.search(query)
 
     # -----------------------------
     # 3. Financial news
     # -----------------------------
     def get_financial_news(self, company: str):
-        query = f"Find recent financial analysis and reports for {company} related to operational financial strength. Focus on liquidity, cash flow, debt, capital expenditure, profitability, capacity investment and financial indicators affecting production continuity. Return only financial data, analysis, and reports with title, date, source, and summary. Exclude stock price, valuation, and investment advice."
+        query = f"Find recent financial analysis and reports for {company} related to operational financial strength. Focus on liquidity, cash flow, debt and financial indicators affecting production continuity. Return only financial data with title, date, source, and summary. Exclude stock price, valuation and investment advice."
         return self.search(query)
 
     # -----------------------------
