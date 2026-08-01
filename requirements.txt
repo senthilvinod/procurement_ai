@@ -8,3 +8,5 @@ os
 prophet
 groq
 tavily-python
+streamlit
+plotly
