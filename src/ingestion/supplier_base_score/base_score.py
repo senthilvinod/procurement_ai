@@ -52,5 +52,5 @@ def calculate_base_score():
     df["base_score"] = df["base_score"].clip(0, 100)
 
     return df
-
-
+    print("\n========== FINAL BASE SCORE ==========\n")
+    print(result.sort_values("base_score", ascending=False).reset_index(drop=True))

@@ -114,5 +114,13 @@ class ForecastAgent:
             "product_forecast": product_statistics,
         }
 
+def run_forecast_agent():
+
+    agent = ForecastAgent()
+
+    result = agent.run()
+
+    return result
+
 if __name__ == "__main__":
     ForecastAgent().run()

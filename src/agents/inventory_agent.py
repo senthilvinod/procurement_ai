@@ -24,7 +24,13 @@ class InventoryAgent:
 
         return inventory_result
 
+def run_inventory_agent():
 
+    agent = InventoryAgent()
+
+    result = agent.run()
+
+    return result
 
 if __name__ == "__main__":
 
